@@ -1,0 +1,36 @@
+package main
+
+import (
+	"time"
+	"fmt"
+	"sync"
+)
+
+var counter int = 0
+func add(a, b int, lock *sync.Mutex) {
+	c := a + b
+	lock.Lock()
+	counter ++
+	fmt.Printf("%d : %d + %d = %d\n", counter,a,b,c)
+	lock.Unlock()
+}
+
+func main()  {
+	start := time.Now()
+	lock := &sync.Mutex{}
+	for i:=0 ; i < 10 ; i++ {
+		go add(1, i, lock)
+	}
+	for {
+		lock.Lock()
+		c := counter
+		lock.Unlock()
+		if c >= 10 {
+			break
+		}
+	}
+	end := time.Now()
+	comsume := end.Sub(start).Seconds()
+	fmt.Println(comsume)
+}
+//Don’t communicate by sharing memory, share memory by communicating
